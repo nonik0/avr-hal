@@ -1,13 +1,10 @@
-pub use atmega_hal::port::mode;
-pub use atmega_hal::port::Pin;
+pub use atmega_hal::port::{mode, Pin, PinMode, PinOps};
 
 avr_hal_generic::renamed_pins! {
-    type Pin = Pin;
-
     /// Pins of the **Arduino Leonardo**.
     ///
-    /// This struct is best initialized via the [`arduino_hal::pins!()`][pins] macro.
-    pub struct Pins from atmega_hal::Pins {
+    /// This struct is best initialized via the [`arduino_hal::pins!()`][crate::pins] macro.
+    pub struct Pins {
         /// `D0` / `RX`
         ///
         /// * `RX` (UART)
@@ -121,5 +118,10 @@ avr_hal_generic::renamed_pins! {
         ///
         /// * `ADC0` channel
         pub a5: atmega_hal::port::PF0 = pf0,
+    }
+
+    impl Pins {
+        type Pin = Pin;
+        type McuPins = atmega_hal::Pins;
     }
 }

@@ -28,8 +28,6 @@
 use arduino_hal::prelude::*;
 use panic_halt as _;
 
-use arduino_hal::adc;
-
 #[arduino_hal::entry]
 fn main() -> ! {
     let dp = arduino_hal::Peripherals::take().unwrap();
@@ -54,13 +52,13 @@ fn main() -> ! {
             x if x > 250 => "dimmly lit",
             x if x > 50 => "rather dark",
             x if x <= 50 => "very dark",
-            x => "invalid", // to satisfy the compiler ()
+            _ => "invalid", // to satisfy the compiler ()
         };
 
         // output to the serial
-        ufmt::uwrite!(&mut serial, "This is a {} room! – ", worded).void_unwrap();
-        ufmt::uwrite!(&mut serial, "Raw value: {} ", sensor_value).void_unwrap();
-        ufmt::uwriteln!(&mut serial, "").void_unwrap();
+        ufmt::uwrite!(&mut serial, "This is a {} room! – ", worded).unwrap_infallible();
+        ufmt::uwrite!(&mut serial, "Raw value: {} ", sensor_value).unwrap_infallible();
+        ufmt::uwriteln!(&mut serial, "").unwrap_infallible();
 
         // wait for half a second then measure again
         arduino_hal::delay_ms(500);

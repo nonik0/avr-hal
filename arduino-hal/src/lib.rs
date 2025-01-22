@@ -9,9 +9,18 @@
 #![cfg_attr(feature = "arduino-diecimila", doc = "**Arduino Diecimila**.")]
 #![cfg_attr(feature = "arduino-leonardo", doc = "**Arduino Leonardo**.")]
 #![cfg_attr(feature = "arduino-mega2560", doc = "**Arduino Mega 2560**.")]
+#![cfg_attr(feature = "arduino-mega1280", doc = "**Arduino Mega 1280**.")]
 #![cfg_attr(feature = "arduino-nano", doc = "**Arduino Nano**.")]
 #![cfg_attr(feature = "arduino-uno", doc = "**Arduino Uno**.")]
 #![cfg_attr(feature = "sparkfun-promicro", doc = "**SparkFun ProMicro**.")]
+#![cfg_attr(
+    feature = "sparkfun-promini-3v3",
+    doc = "**SparkFun ProMini 3.3V (8MHz)**."
+)]
+#![cfg_attr(
+    feature = "sparkfun-promini-5v",
+    doc = "**SparkFun ProMini 5V (16MHz)**."
+)]
 #![cfg_attr(feature = "trinket-pro", doc = "**Trinket Pro**.")]
 #![cfg_attr(feature = "trinket", doc = "**Trinket**.")]
 #![cfg_attr(feature = "nano168", doc = "**Nano clone (ATmega168)**.")]
@@ -54,9 +63,12 @@ compile_error!(
     * arduino-diecimila
     * arduino-leonardo
     * arduino-mega2560
+    * arduino-mega1280
     * arduino-nano
     * arduino-uno
     * sparkfun-promicro
+    * sparkfun-promini-3v3
+    * sparkfun-promini-5v
     * trinket-pro
     * trinket
     * nano168
@@ -112,6 +124,7 @@ pub use delay::{delay_ms, delay_us, Delay};
 
 #[cfg(feature = "board-selected")]
 pub mod port;
+
 #[doc(no_inline)]
 #[cfg(feature = "board-selected")]
 pub use port::Pins;
@@ -162,16 +175,37 @@ pub mod usart {
     pub type UsartReader<USART, RX, TX> =
         crate::hal::usart::UsartReader<USART, RX, TX, crate::DefaultClock>;
 }
+
 #[doc(no_inline)]
 #[cfg(feature = "mcu-atmega")]
 pub use usart::Usart;
 
+#[cfg(feature = "board-selected")]
+pub mod eeprom {
+    pub use crate::hal::eeprom::{Eeprom, EepromOps, OutOfBoundsError};
+}
+#[doc(no_inline)]
+#[cfg(feature = "board-selected")]
+pub use eeprom::Eeprom;
+
+#[cfg(feature = "board-selected")]
+pub mod simple_pwm {
+    #[cfg(feature = "mcu-atmega")]
+    pub use atmega_hal::simple_pwm::*;
+
+    #[cfg(feature = "mcu-attiny")]
+    pub use attiny_hal::simple_pwm::*;
+}
+
 #[cfg(feature = "mcu-atmega")]
 pub mod prelude {
+    pub use crate::hal::prelude::*;
+
     cfg_if::cfg_if! {
         if #[cfg(any(
             feature = "arduino-diecimila",
             feature = "arduino-mega2560",
+            feature = "arduino-mega1280",
             feature = "arduino-uno"
         ))] {
             pub use crate::hal::usart::BaudrateArduinoExt as _;
@@ -179,13 +213,9 @@ pub mod prelude {
             pub use crate::hal::usart::BaudrateExt as _;
         }
     }
-
-    pub use ufmt::uWrite as _;
-    pub use void::ResultVoidErrExt as _;
-    pub use void::ResultVoidExt as _;
 }
 
-/// Convenience macro to instanciate the [`Pins`] struct for this board.
+/// Convenience macro to instantiate the [`Pins`] struct for this board.
 ///
 /// # Example
 /// ```no_run
@@ -200,6 +230,14 @@ macro_rules! pins {
     };
 }
 
+/// Convenience macro to instantiate the [`Usart`] driver for this board.
+///
+/// # Example
+/// ```no_run
+/// let dp = arduino_hal::Peripherals::take().unwrap();
+/// let pins = arduino_hal::pins!(dp);
+/// let serial = arduino_hal::default_serial!(dp, pins, 57600);
+/// ```
 #[cfg(any(feature = "arduino-leonardo"))]
 #[macro_export]
 macro_rules! default_serial {
@@ -212,6 +250,15 @@ macro_rules! default_serial {
         )
     };
 }
+
+/// Convenience macro to instantiate the [`Usart`] driver for this board.
+///
+/// # Example
+/// ```no_run
+/// let dp = arduino_hal::Peripherals::take().unwrap();
+/// let pins = arduino_hal::pins!(dp);
+/// let serial = arduino_hal::default_serial!(dp, pins, 57600);
+/// ```
 #[cfg(any(feature = "sparkfun-promicro"))]
 #[macro_export]
 macro_rules! default_serial {
@@ -224,11 +271,34 @@ macro_rules! default_serial {
         )
     };
 }
-// See comment in avr-hal-generic/src/usart.rs for why these boards use
-// the BaudrateArduinoExt trait instead of BaudrateExt
+
+/// Convenience macro to instantiate the [`Usart`] driver for this board.
+///
+/// # Example
+/// ```no_run
+/// let dp = arduino_hal::Peripherals::take().unwrap();
+/// let pins = arduino_hal::pins!(dp);
+/// let serial = arduino_hal::default_serial!(dp, pins, 57600);
+/// ```
+///
+/// This is equivalent to manually configuring the driver:
+///
+/// ```no_run
+/// let dp = arduino_hal::Peripherals::take().unwrap();
+/// let pins = arduino_hal::pins!(dp);
+/// let serial = arduino_hal::Usart::new(
+///     dp.USART1,
+///     pins.d0,
+///     pins.d1.into_output(),
+///     // See src/usart.rs for why some boards use the BaudrateArduinoExt trait
+///     // instead of BaudrateExt.
+///     arduino_hal::hal::usart::BaudrateArduinoExt::into_baudrate(57600),
+/// );
+/// ```
 #[cfg(any(
     feature = "arduino-diecimila",
     feature = "arduino-mega2560",
+    feature = "arduino-mega1280",
     feature = "arduino-uno"
 ))]
 #[macro_export]
@@ -238,11 +308,27 @@ macro_rules! default_serial {
             $p.USART0,
             $pins.d0,
             $pins.d1.into_output(),
+            // See comment in avr-hal-generic/src/usart.rs for why these boards use the
+            // BaudrateArduinoExt trait instead of BaudrateExt
             $crate::hal::usart::BaudrateArduinoExt::into_baudrate($baud),
         )
     };
 }
-#[cfg(any(feature = "arduino-nano", feature = "nano168"))]
+
+/// Convenience macro to instantiate the [`Usart`] driver for this board.
+///
+/// # Example
+/// ```no_run
+/// let dp = arduino_hal::Peripherals::take().unwrap();
+/// let pins = arduino_hal::pins!(dp);
+/// let serial = arduino_hal::default_serial!(dp, pins, 57600);
+/// ```
+#[cfg(any(
+    feature = "arduino-nano",
+    feature = "nano168",
+    feature = "sparkfun-promini-3v3",
+    feature = "sparkfun-promini-5v",
+))]
 #[macro_export]
 macro_rules! default_serial {
     ($p:expr, $pins:expr, $baud:expr) => {

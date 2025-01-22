@@ -34,7 +34,7 @@ fn main() -> ! {
 
     'outer: loop {
         // the timer is reinitialized with value 0.
-        timer1.tcnt1.write(|w| unsafe { w.bits(0) });
+        timer1.tcnt1.write(|w| w.bits(0));
 
         // the trigger must be set to high under 10 µs as per the HC-SR04 datasheet
         trig.set_high();
@@ -50,12 +50,12 @@ fn main() -> ! {
                     &mut serial,
                     "Nothing was detected and jump to outer loop.\r"
                 )
-                .void_unwrap();
+                .unwrap_infallible();
                 continue 'outer;
             }
         }
         // Restarting the timer
-        timer1.tcnt1.write(|w| unsafe { w.bits(0) });
+        timer1.tcnt1.write(|w| w.bits(0));
 
         // Wait for the echo to get low again
         while echo.is_high() {}
@@ -73,7 +73,7 @@ fn main() -> ! {
                     &mut serial,
                     "Nothing was detected and jump to outer loop.\r"
                 )
-                .void_unwrap();
+                .unwrap_infallible();
                 continue 'outer;
             }
             _ => temp_timer / 58,
@@ -88,6 +88,6 @@ fn main() -> ! {
             "Hello, we are {} cms away from target!\r",
             value
         )
-        .void_unwrap();
+        .unwrap_infallible();
     }
 }

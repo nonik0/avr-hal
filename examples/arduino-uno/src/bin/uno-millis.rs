@@ -16,7 +16,7 @@ use arduino_hal::prelude::*;
 use core::cell;
 use panic_halt as _;
 
-use embedded_hal::serial::Read;
+use embedded_hal_v0::serial::Read;
 
 // Possible Values:
 //
@@ -41,7 +41,7 @@ fn millis_init(tc0: arduino_hal::pac::TC0) {
     // Configure the timer for the above interval (in CTC mode)
     // and enable its interrupt.
     tc0.tccr0a.write(|w| w.wgm0().ctc());
-    tc0.ocr0a.write(|w| unsafe { w.bits(TIMER_COUNTS as u8) });
+    tc0.ocr0a.write(|w| w.bits(TIMER_COUNTS as u8));
     tc0.tccr0b.write(|w| match PRESCALER {
         8 => w.cs0().prescale_8(),
         64 => w.cs0().prescale_64(),
@@ -85,9 +85,9 @@ fn main() -> ! {
 
     // Wait for a character and print current time once it is received
     loop {
-        let b = nb::block!(serial.read()).void_unwrap();
+        let b = nb::block!(serial.read()).unwrap_infallible();
 
         let time = millis();
-        ufmt::uwriteln!(&mut serial, "Got {} after {} ms!\r", b, time).void_unwrap();
+        ufmt::uwriteln!(&mut serial, "Got {} after {} ms!\r", b, time).unwrap_infallible();
     }
 }

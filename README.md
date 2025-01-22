@@ -2,11 +2,39 @@ avr-hal ![Continuous Integration](https://github.com/Rahix/avr-hal/workflows/Con
 =======
 Hardware Abstraction Layer for AVR microcontrollers and common boards (for example Arduino).  Based on the [`avr-device`](https://github.com/Rahix/avr-device) crate.
 
-**This is a new version of `avr-hal`!  Older versions can be found in the `old` branch but will no longer get support.**
-
 ## Quickstart
-You need a nightly Rust compiler for compiling Rust code for AVR.  **Note**: Due to a regression, versions after `nightly-2021-01-07` are currently broken (see [#124](https://github.com/Rahix/avr-hal/issues/124)).  Please use that version of the compiler for now. The correct version will be installed automatically.
+You need a nightly Rust compiler for compiling Rust code for AVR.  The correct version will be installed automatically due to the `rust-toolchain.toml` file.
 
+Install dependencies:
+
+- Ubuntu
+  ```bash
+  sudo apt install avr-libc gcc-avr pkg-config avrdude libudev-dev build-essential
+  ```
+- Macos  
+  ```bash
+  xcode-select --install # if you haven't already done so
+  brew tap osx-cross/avr
+  brew install avr-gcc avrdude
+  ```
+- Windows
+
+  Use [`winget`](https://learn.microsoft.com/en-us/windows/package-manager/winget/) on Windows 10 & Windows 11:
+  ```
+  winget install AVRDudes.AVRDUDE ZakKemble.avr-gcc
+  ```
+  On older systems you can use [Scoop](https://scoop.sh/) which you first have to install using Powershell:
+  ```PowerShell
+  Set-ExecutionPolicy RemoteSigned -Scope CurrentUser # Needed to run a remote script the first time
+  irm get.scoop.sh | iex
+  ```
+  Install avr-gcc and avrdude
+  ```
+  scoop install avr-gcc
+  scoop install avrdude
+  ```
+  See [Setting up environment](https://github.com/Rahix/avr-hal/wiki/Setting-up-environment) for more information.
+  
 Next, install ["ravedude"](./ravedude), a tool which seamlessly integrates flashing your board into the usual cargo workflow:
 
 ```bash
@@ -26,6 +54,7 @@ cargo run --bin uno-blink
 The best way to start your own project is via the [`avr-hal-template`](https://github.com/Rahix/avr-hal-template) which you can easily use with [`cargo-generate`](https://github.com/cargo-generate/cargo-generate):
 
 ```bash
+cargo install cargo-generate
 cargo generate --git https://github.com/Rahix/avr-hal-template.git
 ```
 
@@ -42,7 +71,7 @@ The [examples directory](./examples) contains lots of examples for common hardwa
 HAL crates for AVR microcontroller families.  If you have a custom board, you'll want to work with these crates.  Please check their documentation for a list of supported MCUs.
 
 ### `avr-hal-generic` [![avr-hal-generic docs](https://img.shields.io/badge/docs-git-4d76ae)][avr-hal-generic docs]
-This is a generic crate containing most of the HAL implementaions in the form of macros which are instanciated in each HAL crate for the specific MCUs.  If you intend to write drivers that work with any AVR chip, targeting `avr-hal-generic` is probably the best route.
+This is a generic crate containing most of the HAL implementations in the form of macros which are instanciated in each HAL crate for the specific MCUs.  If you intend to write drivers that work with any AVR chip, targeting `avr-hal-generic` is probably the best route.
 
 ### `avr-specs/`
 The `avr-specs/` directory contains rustc target definitions for all supported microcontrollers.  You will need these for compiling rust code for AVR.  The [`avr-hal-template`](https://github.com/Rahix/avr-hal-template) already includes them for convenience.

@@ -1,7 +1,7 @@
 //! GPIO & Pin control.
 //!
 //! This module contains a [`Pins`] struct which represents all pins of the board.  The [`Pins`]
-//! struct is most easily constructed using the [`arduino_hal::pins!()`][pins] macro:
+//! struct is most easily constructed using the [`arduino_hal::pins!()`][crate::pins] macro:
 //!
 //! ```no_run
 //! let dp = arduino_hal::Peripherals::take().unwrap();
@@ -23,13 +23,25 @@ pub use diecimila::*;
 mod leonardo;
 #[cfg(feature = "arduino-leonardo")]
 pub use leonardo::*;
-#[cfg(feature = "arduino-mega2560")]
-mod mega2560;
-#[cfg(feature = "arduino-mega2560")]
-pub use mega2560::*;
-#[cfg(any(feature = "arduino-nano", feature = "arduino-uno", feature = "nano168"))]
+#[cfg(any(feature = "arduino-mega2560", feature = "arduino-mega1280"))]
+mod mega;
+#[cfg(any(feature = "arduino-mega2560", feature = "arduino-mega1280"))]
+pub use mega::*;
+#[cfg(any(
+    feature = "arduino-nano",
+    feature = "arduino-uno",
+    feature = "nano168",
+    feature = "sparkfun-promini-3v3",
+    feature = "sparkfun-promini-5v"
+))]
 mod uno;
-#[cfg(any(feature = "arduino-nano", feature = "arduino-uno", feature = "nano168"))]
+#[cfg(any(
+    feature = "arduino-nano",
+    feature = "arduino-uno",
+    feature = "nano168",
+    feature = "sparkfun-promini-3v3",
+    feature = "sparkfun-promini-5v"
+))]
 pub use uno::*;
 #[cfg(feature = "sparkfun-promicro")]
 mod promicro;
