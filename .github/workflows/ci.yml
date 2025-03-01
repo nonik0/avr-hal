@@ -98,6 +98,14 @@ jobs:
             name: attiny404
             spec: attiny404
             crate: avrxmega-hal
+          - type: mcu
+            name: attiny804
+            spec: attiny804
+            crate: avrxmega-hal
+          - type: mcu
+            name: attiny1604
+            spec: attiny1604
+            crate: avrxmega-hal
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code

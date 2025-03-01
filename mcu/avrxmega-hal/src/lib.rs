@@ -5,7 +5,10 @@
 //! Common HAL (hardware abstraction layer) for AVR XMEGA microcontrollers.
 //!
 //! **Note**: This version of the documentation was built for
+#![cfg_attr(feature = "attiny204", doc = "**ATtiny204**.")]
 #![cfg_attr(feature = "attiny404", doc = "**ATtiny404**.")]
+#![cfg_attr(feature = "attiny804", doc = "**ATtiny804**.")]
+#![cfg_attr(feature = "attiny1604", doc = "**ATtiny1604**.")]
 //! This means that only items which are available for this MCU are visible.  If you are using
 //! a different chip, try building the documentation locally with:
 //!
@@ -22,13 +25,28 @@ compile_error!(
 
     Please select one of the following
 
+    * attiny204
     * attiny404
+    * attiny804
+    * attiny1604
     "
 );
+
+/// Reexport of `attiny204` from `avr-device`
+#[cfg(feature = "attiny204")]
+pub use avr_device::attiny404 as pac;
 
 /// Reexport of `attiny404` from `avr-device`
 #[cfg(feature = "attiny404")]
 pub use avr_device::attiny404 as pac;
+
+/// Reexport of `attiny804` from `avr-device`
+#[cfg(feature = "attiny404")]
+pub use avr_device::attiny804 as pac;
+
+/// Reexport of `attiny1604` from `avr-device`
+#[cfg(feature = "attiny404")]
+pub use avr_device::attiny1604 as pac;
 
 /// See [`avr_device::entry`](https://docs.rs/avr-device/latest/avr_device/attr.entry.html).
 #[cfg(feature = "rt")]
@@ -46,7 +64,31 @@ pub mod port;
 #[cfg(feature = "device-selected")]
 pub use port::Pins;
 
+#[cfg(feature = "attiny204")]
+#[macro_export]
+macro_rules! pins {
+    ($p:expr) => {
+        $crate::Pins::new($p.PORTA, $p.PORTB)
+    };
+}
+
 #[cfg(feature = "attiny404")]
+#[macro_export]
+macro_rules! pins {
+    ($p:expr) => {
+        $crate::Pins::new($p.PORTA, $p.PORTB)
+    };
+}
+
+#[cfg(feature = "attiny804")]
+#[macro_export]
+macro_rules! pins {
+    ($p:expr) => {
+        $crate::Pins::new($p.PORTA, $p.PORTB)
+    };
+}
+
+#[cfg(feature = "attiny1604")]
 #[macro_export]
 macro_rules! pins {
     ($p:expr) => {
