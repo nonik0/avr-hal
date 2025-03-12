@@ -30,7 +30,7 @@ docsrs = ["attiny1604"]
 avr-hal-generic = { path = "../../avr-hal-generic/" }
 
 [dependencies.avr-device]
-path = "G:\\rust\\avr-device"
+path = "..\\..\\avr-device" # built locally
 #git = "https://github.com/nonik0/avr-device" # TEMP until PRed
 #ref = "main"
 #version = "0.7"
