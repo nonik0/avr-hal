@@ -41,11 +41,11 @@ pub use avr_device::attiny404 as pac;
 pub use avr_device::attiny404 as pac;
 
 /// Reexport of `attiny804` from `avr-device`
-#[cfg(feature = "attiny404")]
+#[cfg(feature = "attiny804")]
 pub use avr_device::attiny804 as pac;
 
 /// Reexport of `attiny1604` from `avr-device`
-#[cfg(feature = "attiny404")]
+#[cfg(feature = "attiny1604")]
 pub use avr_device::attiny1604 as pac;
 
 /// See [`avr_device::entry`](https://docs.rs/avr-device/latest/avr_device/attr.entry.html).

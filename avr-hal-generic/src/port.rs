@@ -919,7 +919,7 @@ macro_rules! impl_port_xmega {
             #[inline]
             unsafe fn in_get(&self) -> bool {
                 match self.port {
-                    $(DynamicPort::$PortName => (*<$Port>::ptr()).in_.read().bits()
+                    $(DynamicPort::$PortName => (*<$Port>::ptr()).input.read().bits()
                         & self.mask != 0,)+
                 }
             }
@@ -1013,7 +1013,7 @@ macro_rules! impl_port_xmega {
 
                 #[inline]
                 unsafe fn in_get(&self) -> bool {
-                    (*<$PinPort>::ptr()).in_.read().bits() & (1 << $pin_num) != 0
+                    (*<$PinPort>::ptr()).input.read().bits() & (1 << $pin_num) != 0
                 }
 
                 #[inline]
