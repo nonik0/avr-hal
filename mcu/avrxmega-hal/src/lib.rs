@@ -60,9 +60,21 @@ pub use avr_hal_generic::delay;
 pub use avr_hal_generic::prelude;
 
 #[cfg(feature = "device-selected")]
+pub mod adc;
+#[cfg(feature = "device-selected")]
+pub use adc::Adc;
+
+#[cfg(feature = "device-selected")]
 pub mod port;
 #[cfg(feature = "device-selected")]
 pub use port::Pins;
+
+// #[cfg(feature = "device-selected")]
+// pub mod eeprom;
+// #[cfg(feature = "device-selected")]
+// pub use eeprom::Eeprom;
+
+pub struct Avrxmega;
 
 #[cfg(feature = "attiny204")]
 #[macro_export]
