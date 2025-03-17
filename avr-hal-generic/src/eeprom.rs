@@ -406,3 +406,54 @@ macro_rules! impl_eeprom_attiny {
         }
     };
 }
+
+#[macro_export]
+macro_rules! impl_eeprom_xmega {
+    (
+        hal: $HAL:ty,
+        peripheral: $EEPROM:ty,
+        capacity: $capacity:literal,
+        addr_start: $addr_start:literal,
+        addr_width: $addrwidth:ty,
+    ) => {
+        impl $crate::eeprom::EepromOps<$HAL> for $EEPROM {
+            const CAPACITY: u16 = $capacity;
+
+            fn raw_read_byte(&self, address: u16) -> u8 {
+                unsafe {
+                    *($addr_start as *const u8).add(address as usize) as u8
+                }
+            }
+
+            fn raw_write_byte(&mut self, address: u16, data: u8) {
+                unsafe {
+                    let address = $addr_start + address;
+                    asm!(
+                        "ldi r30, 0x00", // Z <- 0x1000 (NVMCTRL base address)
+                        "ldi r31, 0x10", //
+                        "in r0, 0x3f",   // r0 = SREG (save interrupt state)
+                        "ldd r18, Z+2",  // load NVMCTRL.STATUS (Z+2, 0x1002)
+                        "andi r18, 3",   // if NVMCTRL.STATUS.EEBUSY | NVMCTRL.STATUS.FBUSY
+                        "brne .-6",      // then keep checking
+                        "cli",           // disable interrupts
+                        "st X, r17",     // *address = data
+                        "ldi r18, 0x9D", //
+                        "out 0x34, r18", // CPU.CCP = 0x9D (SPM unlock)
+                        "ldi r18, 0x03", //
+                        "st Z, r18",     // NVMCTRL.CTRLA = 0x03 (ERWP erase/write cmd)
+                        "out 0x3f, r0",  // SREG = r0 (restore interrupt state)
+                        in("r17") data,  // r17 = data (needs to be upper reg for ldi)
+                        in("X") address, // X = address
+                        out("r18") _,    // clobbered (same as data reg, upper reg for ldi)
+                        out("r30") _,    // clobbered
+                        out("r31") _,    // clobbered
+                    );
+                }
+            }
+
+            fn raw_erase_byte(&mut self, address: u16) {
+                self.raw_write_byte(address, 0xFF);
+            }
+        }
+    };
+}

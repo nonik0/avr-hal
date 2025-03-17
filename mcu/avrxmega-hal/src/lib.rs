@@ -1,4 +1,5 @@
 #![no_std]
+#![feature(asm_experimental_arch)]
 
 //! `avrxmega-hal`
 //! =============
@@ -69,10 +70,10 @@ pub mod port;
 #[cfg(feature = "device-selected")]
 pub use port::Pins;
 
-// #[cfg(feature = "device-selected")]
-// pub mod eeprom;
-// #[cfg(feature = "device-selected")]
-// pub use eeprom::Eeprom;
+#[cfg(feature = "device-selected")]
+pub mod eeprom;
+#[cfg(feature = "device-selected")]
+pub use eeprom::Eeprom;
 
 pub struct Avrxmega;
 

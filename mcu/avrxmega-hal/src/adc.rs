@@ -1,3 +1,6 @@
+// TODO: really need to figure out how to design handle using ADC0 and VREF peripherals
+// should ADC manage both together or should they be separate, or maybe an optional reference to VREF?
+
 #![allow(non_camel_case_types)]
 //! Analog-to-Digital Converter
 //!
