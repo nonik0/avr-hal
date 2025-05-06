@@ -27,7 +27,8 @@ embedded-hal-bus = "0.1"
 unwrap-infallible = "0.1.5"
 
 [dependencies.avr-device]
-path = "G:\\rust\\avr\\avr-device" # built locally
+git = "https://github.com/Rahix/avr-device"
+branch = "main"
 
 [dependencies.embedded-hal-v0]
 version = "0.2.3"

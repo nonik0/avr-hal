@@ -82,9 +82,9 @@ impl avr_hal_generic::adc::AdcOps<crate::Avrxmega> for crate::pac::ADC0 {
 
     #[inline]
     fn raw_init(&mut self, settings: Self::Settings) {
-        self.ctrla.write(|w| w.enable().set_bit());
+        self.ctrla().write(|w| w.enable().set_bit());
         // TODO: resolution
-        self.ctrlc.write(|w| {
+        self.ctrlc().write(|w| {
             match settings.ref_voltage {
                 ReferenceVoltage::Internal => w.refsel().intref(),
                 ReferenceVoltage::VDD => w.refsel().vddref(),
@@ -104,27 +104,27 @@ impl avr_hal_generic::adc::AdcOps<crate::Avrxmega> for crate::pac::ADC0 {
 
     #[inline]
     fn raw_read_adc(&self) -> u16 {
-        self.res.read().bits()
+        self.res().read().bits()
     }
 
     #[inline]
     fn raw_is_converting(&self) -> bool {
-        self.command.read().stconv().bit_is_set()
+        self.command().read().stconv().bit_is_set()
     }
 
     #[inline]
     fn raw_start_conversion(&mut self) {
-        self.command.write(|w| w.stconv().set_bit());
+        self.command().write(|w| w.stconv().set_bit());
     }
 
     #[inline]
     fn raw_set_channel(&mut self, channel: Self::Channel) {
-        self.muxpos.modify(|_, w| w.muxpos().variant(channel));
+        self.muxpos().modify(|_, w| w.muxpos().variant(channel));
     }
 
     #[inline]
     fn raw_enable_channel(&mut self, channel: Self::Channel) {
-        self.muxpos.modify(|_, w| w.muxpos().variant(channel));
+        self.muxpos().modify(|_, w| w.muxpos().variant(channel));
     }
 
     #[inline]

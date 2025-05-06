@@ -18,8 +18,6 @@ attiny404 = ["avr-device/attiny404", "device-selected"]
 attiny804 = ["avr-device/attiny804", "device-selected"]
 attiny1604 = ["avr-device/attiny1604", "device-selected"]
 
-critical-section-impl = ["avr-device/critical-section-impl"]
-
 # Allow certain downstream crates to overwrite the device selection error by themselves.
 disable-device-selection-error = []
 
@@ -30,8 +28,7 @@ docsrs = ["attiny1604"]
 avr-hal-generic = { path = "../../avr-hal-generic/" }
 
 [dependencies.avr-device]
-#path = "G:\\rust\\avr\\avr-device" # built locally
-git = "https://github.com/nonik0/avr-device"
+git = "https://github.com/Rahix/avr-device"
 branch = "main"
 
 # Because this crate has its own check that at least one device is selected, we

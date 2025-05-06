@@ -884,34 +884,37 @@ macro_rules! impl_port_xmega {
             #[inline]
             unsafe fn out_set(&mut self) {
                 match self.port {
-                    $(DynamicPort::$PortName => (*<$Port>::ptr()).outset.write(|w| {
+                    $(DynamicPort::$PortName => (*<$Port>::ptr()).outset().write(|w| {
                         w.bits(self.mask)
                     }),)+
-                }
+                };
+                ()
             }
 
             #[inline]
             unsafe fn out_clear(&mut self) {
                 match self.port {
-                    $(DynamicPort::$PortName => (*<$Port>::ptr()).outclr.write(|w| {
+                    $(DynamicPort::$PortName => (*<$Port>::ptr()).outclr().write(|w| {
                         w.bits(self.mask)
                     }),)+
-                }
+                };
+                ()
             }
 
             #[inline]
             unsafe fn out_toggle(&mut self) {
                 match self.port {
-                    $(DynamicPort::$PortName => (*<$Port>::ptr()).outtgl.write(|w| {
+                    $(DynamicPort::$PortName => (*<$Port>::ptr()).outtgl().write(|w| {
                         w.bits(self.mask)
                     }),)+
-                }
+                };
+                ()
             }
 
             #[inline]
             unsafe fn out_get(&self) -> bool {
                 match self.port {
-                    $(DynamicPort::$PortName => (*<$Port>::ptr()).out.read().bits()
+                    $(DynamicPort::$PortName => (*<$Port>::ptr()).out().read().bits()
                         & self.mask != 0,)+
                 }
             }
@@ -919,7 +922,7 @@ macro_rules! impl_port_xmega {
             #[inline]
             unsafe fn in_get(&self) -> bool {
                 match self.port {
-                    $(DynamicPort::$PortName => (*<$Port>::ptr()).input.read().bits()
+                    $(DynamicPort::$PortName => (*<$Port>::ptr()).input().read().bits()
                         & self.mask != 0,)+
                 }
             }
@@ -927,50 +930,51 @@ macro_rules! impl_port_xmega {
             #[inline]
             unsafe fn make_output(&mut self) {
                 match self.port {
-                    $(DynamicPort::$PortName => (*<$Port>::ptr()).dirset.write(|w| {
+                    $(DynamicPort::$PortName => (*<$Port>::ptr()).dirset().write(|w| {
                         w.bits(self.mask)
                     }),)+
-                }
+                };
+                ()
             }
 
             #[inline]
             unsafe fn make_input(&mut self, pull_up: bool) {
-                match self.port {
-                    $(DynamicPort::$PortName => {
-                        if pull_up {
-                            match self.mask {
-                                0x01 => (*<$Port>::ptr()).pin0ctrl.modify(|_, w| w.pullupen().set_bit()),
-                                0x02 => (*<$Port>::ptr()).pin1ctrl.modify(|_, w| w.pullupen().set_bit()),
-                                0x04 => (*<$Port>::ptr()).pin2ctrl.modify(|_, w| w.pullupen().set_bit()),
-                                0x08 => (*<$Port>::ptr()).pin3ctrl.modify(|_, w| w.pullupen().set_bit()),
-                                0x10 => (*<$Port>::ptr()).pin4ctrl.modify(|_, w| w.pullupen().set_bit()),
-                                0x20 => (*<$Port>::ptr()).pin5ctrl.modify(|_, w| w.pullupen().set_bit()),
-                                0x40 => (*<$Port>::ptr()).pin6ctrl.modify(|_, w| w.pullupen().set_bit()),
-                                0x80 => (*<$Port>::ptr()).pin7ctrl.modify(|_, w| w.pullupen().set_bit()),
-                                // TODO exhaustive match with an enum?
-                                //_ => unreachable!()
-                                _ => {}
-                            }
-                        } else {
-                            match self.mask {
-                                0x01 => (*<$Port>::ptr()).pin0ctrl.modify(|_, w| w.pullupen().clear_bit()),
-                                0x02 => (*<$Port>::ptr()).pin1ctrl.modify(|_, w| w.pullupen().clear_bit()),
-                                0x04 => (*<$Port>::ptr()).pin2ctrl.modify(|_, w| w.pullupen().clear_bit()),
-                                0x08 => (*<$Port>::ptr()).pin3ctrl.modify(|_, w| w.pullupen().clear_bit()),
-                                0x10 => (*<$Port>::ptr()).pin4ctrl.modify(|_, w| w.pullupen().clear_bit()),
-                                0x20 => (*<$Port>::ptr()).pin5ctrl.modify(|_, w| w.pullupen().clear_bit()),
-                                0x40 => (*<$Port>::ptr()).pin6ctrl.modify(|_, w| w.pullupen().clear_bit()),
-                                0x80 => (*<$Port>::ptr()).pin7ctrl.modify(|_, w| w.pullupen().clear_bit()),
-                                // TODO exhaustive match with an enum?
-                                //_ => unreachable!()
-                                _ => {}
-                            }
-                        }
-                        (*<$Port>::ptr()).dirclr.write(|w| {
-                            w.bits(self.mask)
-                        });
-                    })+
-                }
+                // match self.port {
+                //     $(DynamicPort::$PortName => {
+                //         if pull_up {
+                //             match self.mask {
+                //                 0x01 => (*<$Port>::ptr()).pin0ctrl().modify(|_, w| w.pullupen().set_bit();),
+                //                 0x02 => (*<$Port>::ptr()).pin1ctrl().modify(|_, w| w.pullupen().set_bit();),
+                //                 0x04 => (*<$Port>::ptr()).pin2ctrl().modify(|_, w| w.pullupen().set_bit();),
+                //                 0x08 => (*<$Port>::ptr()).pin3ctrl().modify(|_, w| w.pullupen().set_bit();),
+                //                 0x10 => (*<$Port>::ptr()).pin4ctrl().modify(|_, w| w.pullupen().set_bit();),
+                //                 0x20 => (*<$Port>::ptr()).pin5ctrl().modify(|_, w| w.pullupen().set_bit();),
+                //                 0x40 => (*<$Port>::ptr()).pin6ctrl().modify(|_, w| w.pullupen().set_bit();),
+                //                 0x80 => (*<$Port>::ptr()).pin7ctrl().modify(|_, w| w.pullupen().set_bit();),
+                //                 // TODO exhaustive match with an enum?
+                //                 //_ => unreachable!()
+                //                 _ => {}
+                //             }
+                //         } else {
+                //             match self.mask {
+                //                 0x01 => (*<$Port>::ptr()).pin0ctrl().modify(|_, w| w.pullupen().clear_bit();),
+                //                 0x02 => (*<$Port>::ptr()).pin1ctrl().modify(|_, w| w.pullupen().clear_bit();),
+                //                 0x04 => (*<$Port>::ptr()).pin2ctrl().modify(|_, w| w.pullupen().clear_bit();),
+                //                 0x08 => (*<$Port>::ptr()).pin3ctrl().modify(|_, w| w.pullupen().clear_bit();),
+                //                 0x10 => (*<$Port>::ptr()).pin4ctrl().modify(|_, w| w.pullupen().clear_bit();),
+                //                 0x20 => (*<$Port>::ptr()).pin5ctrl().modify(|_, w| w.pullupen().clear_bit();),
+                //                 0x40 => (*<$Port>::ptr()).pin6ctrl().modify(|_, w| w.pullupen().clear_bit();),
+                //                 0x80 => (*<$Port>::ptr()).pin7ctrl().modify(|_, w| w.pullupen().clear_bit();),
+                //                 // TODO exhaustive match with an enum?
+                //                 //_ => unreachable!()
+                //                 _ => {}
+                //             }
+                //         }
+                //         (*<$Port>::ptr()).dirclr().write(|w| {
+                //             w.bits(self.mask)
+                //         });
+                //     })+
+                // }
             }
         }
 
@@ -989,36 +993,36 @@ macro_rules! impl_port_xmega {
 
                 #[inline]
                 unsafe fn out_set(&mut self) {
-                    (*<$PinPort>::ptr()).outset.write(|w| {
+                    (*<$PinPort>::ptr()).outset().write(|w| {
                         w.bits(1 << $pin_num)
                     });
                 }
 
                 #[inline]
                 unsafe fn out_clear(&mut self) {
-                    (*<$PinPort>::ptr()).outclr.write(|w| {
+                    (*<$PinPort>::ptr()).outclr().write(|w| {
                         w.bits(1 << $pin_num)
                     });
                 }
 
                 #[inline]
                 unsafe fn out_toggle(&mut self) {
-                    (*<$PinPort>::ptr()).outtgl.write(|w| w.bits(1 << $pin_num));
+                    (*<$PinPort>::ptr()).outtgl().write(|w| w.bits(1 << $pin_num));
                 }
 
                 #[inline]
                 unsafe fn out_get(&self) -> bool {
-                    (*<$PinPort>::ptr()).out.read().bits() & (1 << $pin_num) != 0
+                    (*<$PinPort>::ptr()).out().read().bits() & (1 << $pin_num) != 0
                 }
 
                 #[inline]
                 unsafe fn in_get(&self) -> bool {
-                    (*<$PinPort>::ptr()).input.read().bits() & (1 << $pin_num) != 0
+                    (*<$PinPort>::ptr()).input().read().bits() & (1 << $pin_num) != 0
                 }
 
                 #[inline]
                 unsafe fn make_output(&mut self) {
-                    (*<$PinPort>::ptr()).dirset.write(|w| {
+                    (*<$PinPort>::ptr()).dirset().write(|w| {
                         w.bits(1 << $pin_num)
                     });
                 }
@@ -1026,11 +1030,11 @@ macro_rules! impl_port_xmega {
                 #[inline]
                 unsafe fn make_input(&mut self, pull_up: bool) {
                     if pull_up {
-                        (*<$PinPort>::ptr()).$pin_pinctrl_reg.modify(|_, w| w.pullupen().set_bit());
+                        (*<$PinPort>::ptr()).$pin_pinctrl_reg().modify(|_, w| w.pullupen().set_bit());
                     } else {
-                        (*<$PinPort>::ptr()).$pin_pinctrl_reg.modify(|_, w| w.pullupen().clear_bit());
+                        (*<$PinPort>::ptr()).$pin_pinctrl_reg().modify(|_, w| w.pullupen().clear_bit());
                     }
-                    (*<$PinPort>::ptr()).dirclr.write(|w| {
+                    (*<$PinPort>::ptr()).dirclr().write(|w| {
                         w.bits(1 << $pin_num)
                     });
                 }
