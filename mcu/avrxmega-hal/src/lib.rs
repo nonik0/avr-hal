@@ -35,7 +35,7 @@ compile_error!(
 
 /// Reexport of `attiny204` from `avr-device`
 #[cfg(feature = "attiny204")]
-pub use avr_device::attiny404 as pac;
+pub use avr_device::attiny204 as pac;
 
 /// Reexport of `attiny404` from `avr-device`
 #[cfg(feature = "attiny404")]
