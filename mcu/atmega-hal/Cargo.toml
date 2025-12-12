@@ -29,8 +29,6 @@ atmega1284p = ["avr-device/atmega1284p", "device-selected"]
 atmega8 = ["avr-device/atmega8", "device-selected"]
 atmega88p = ["avr-device/atmega88p", "device-selected"]
 
-critical-section-impl = ["avr-device/critical-section-impl"]
-
 # Allow certain downstream crates to overwrite the device selection error by themselves.
 disable-device-selection-error = []
 
@@ -41,7 +39,7 @@ docsrs = ["atmega328p"]
 avr-hal-generic = { path = "../../avr-hal-generic/" }
 
 [dependencies.avr-device]
-version = "0.7"
+version = "0.8"
 
 # Because this crate has its own check that at least one device is selected, we
 # can safely "circumvent" the check in `avr-device`.

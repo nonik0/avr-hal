@@ -93,6 +93,7 @@
 //! For reference, take a look at [`boards.toml`](https://github.com/Rahix/avr-hal/blob/main/ravedude/src/boards.toml).
 use anyhow::Context as _;
 use colored::Colorize as _;
+use config::OutputMode;
 
 use std::path::Path;
 use std::thread;
@@ -129,6 +130,14 @@ struct Args {
     #[clap(short = 'c', long = "open-console")]
     open_console: bool,
 
+    #[clap(
+        short = 'C',
+        long = "console-port",
+        value_parser,
+        env = "RAVEDUDE_CONSOLE_PORT"
+    )]
+    console_port: Option<std::path::PathBuf>,
+
     /// Baudrate which should be used for the serial console.
     #[clap(short = 'b', long = "baudrate")]
     baudrate: Option<u32>,
@@ -159,7 +168,13 @@ struct Args {
     /// Should not be used in newer configurations.
     #[clap(name = "LEGACY BINARY", value_parser)]
     bin_legacy: Option<std::path::PathBuf>,
+
+    /// Output mode.
+    /// Can be ascii, hex, dec or bin
+    #[clap(short = 'o', long = "output-mode")]
+    output_mode: Option<OutputMode>,
 }
+
 impl Args {
     /// Get the board name for legacy configurations.
     /// `None` if the configuration isn't a legacy configuration or the board name doesn't exist.
@@ -269,7 +284,7 @@ fn ravedude() -> anyhow::Result<()> {
     );
 
     let port = match ravedude_config.general_options.port {
-        Some(port) => Ok(Some(port)),
+        Some(ref port) => Ok(Some(port.clone())),
         None => match board.guess_port() {
             Some(Ok(port)) => Ok(Some(port)),
             p @ Some(Err(_)) => p.transpose().context(
@@ -334,13 +349,24 @@ fn ravedude() -> anyhow::Result<()> {
                 "-b/--baudrate is needed for the serial console"
             })?;
 
-        let port = port.context("console can only be opened for devices with USB-to-Serial")?;
+        let console_port = ravedude_config.general_options.console_port.clone();
+        let port = console_port
+            .or_else(|| port)
+            .context("no programmer serial port or `console-port` was set")
+            .context("cannot open console without a serial port")?;
+        let newline_mode = ravedude_config.general_options.newline_mode()?;
 
         task_message!("Console", "{} at {} baud", port.display(), baudrate);
         task_message!("", "{}", "CTRL+C to exit.".dimmed());
         // Empty line for visual consistency
         eprintln!();
-        console::open(&port, baudrate.get())?;
+        console::open(
+            &port,
+            baudrate.get(),
+            ravedude_config.general_options.output_mode,
+            newline_mode,
+            newline_mode.space_after(),
+        )?;
     } else if args.bin.is_none() && port.is_some() {
         warning!("you probably meant to add -c/--open-console?");
     }

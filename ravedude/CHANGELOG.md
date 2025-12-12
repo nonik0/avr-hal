@@ -7,6 +7,41 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [0.2.2] - 2025-10-26
+### Added
+- Added a `general.console-port` option with a corresponding
+  `-C`/`--console-port` CLI option to set a console port that's separate from
+  the programming port ([#683]).
+- Support for the AVR `butterfly` board ([#685]).
+- Support for the _SparkFun Pro Mini 3v3_ (`promini-3v3`) board ([#687]).
+
+[#683]: https://github.com/Rahix/avr-hal/pull/683
+[#685]: https://github.com/Rahix/avr-hal/pull/685
+[#687]: https://github.com/Rahix/avr-hal/pull/687
+
+
+## [0.2.1] - 2025-08-31
+### Added
+- Added a `general.output-mode` setting in `Ravedude.toml` ([#549]).
+
+  This setting can be used to set a numeric output mode for the serial console
+  instead of the default ascii representation.  One of `ascii`, `hex`, `dec`,
+  or `bin` can be chosen.
+
+  Additionaly either `general.newline-after = N` can be set to print a newline
+  after N bytes, or `general.newline-on = "\n"` to print a newline when a
+  specific byte is received.
+
+  For example:
+  ```toml
+  [general]
+  output-mode = "hex"
+  newline-after = 4
+  ```
+
+[#549]: https://github.com/Rahix/avr-hal/pull/549
+
+
 ## [0.2.0] - 2025-04-22
 ### Changed
 - **BREAKING** ravedude is now configured using a `Ravedude.toml` configuration
@@ -138,7 +173,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 Initial, miminal version.
 
 
-[Unreleased]: https://github.com/rahix/avr-hal/compare/ravedude-0.2.0...HEAD
+[Unreleased]: https://github.com/rahix/avr-hal/compare/ravedude-0.2.2...HEAD
+[0.2.2]: https://github.com/rahix/avr-hal/compare/ravedude-0.2.1...ravedude-0.2.2
+[0.2.1]: https://github.com/rahix/avr-hal/compare/ravedude-0.2.0...ravedude-0.2.1
 [0.2.0]: https://github.com/rahix/avr-hal/compare/ravedude-0.1.8...ravedude-0.2.0
 [0.1.8]: https://github.com/rahix/avr-hal/compare/ravedude-0.1.7...ravedude-0.1.8
 [0.1.7]: https://github.com/rahix/avr-hal/compare/ravedude-0.1.6...ravedude-0.1.7

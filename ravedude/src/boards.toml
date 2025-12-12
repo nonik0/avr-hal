@@ -179,6 +179,21 @@
     [promini-5v.usb-info]
     error = "Not able to guess port"
 
+[promini-3v3]
+    name = "SparkFun Pro Mini 3v3 (8MHz)"
+
+    [promini-3v3.reset]
+    automatic = true
+
+    [promini-3v3.avrdude]
+    programmer = "arduino"
+    partno = "atmega328p"
+    baudrate = 57600
+    do-chip-erase = true
+
+    [promini-3v3.usb-info]
+    error = "Not able to guess port"
+
 [trinket-pro]
     name = "Trinket Pro"
 
@@ -253,3 +268,17 @@
 
     [mighty-core-atmega1284p.usb-info]
     error = "Not able to guess port"
+
+[butterfly]
+    name = "AVR Butterfly (ATmega169(V))"
+
+    [butterfly.reset]
+    automatic = true
+
+    [butterfly.avrdude]
+    programmer = "stk500v2"
+    partno = "atmega169"
+    baudrate = -1
+    do-chip-erase = true
+
+    # The AVR Butterfly does not have USB-Serial, thus no port is known or needed.
